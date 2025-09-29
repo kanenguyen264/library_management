@@ -1,0 +1,118 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.coverage
+htmlcov/
+.pytest_cache/
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+nosetests.xml
+
+# Environments
+.env
+.env.*
+!.env.example
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+
+# Databases
+*.sqlite3
+*.db
+*.sql
+postgres-data/
+
+# Logs
+logs/*
+!logs/.gitkeep
+*.log
+log/
+
+# Project specific
+alembic/versions/*
+!alembic/versions/.gitkeep
+!alembic/versions/README
+secrets/
+media/
+static/collected/
+celerybeat-schedule
+celerybeat.pid
+.mypy_cache/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Caches
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Generated files
+*.tar.gz
+*.zip
+*.gzip
+generated/
+
+# Temp files
+tmp/
+temp/
+.temp/
+
+# Keys and certificates
+*.key
+*.pem
+*.crt
+*.cert
+
+# Node (for documentation or frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Web assets
+.webassets-cache/
+.sass-cache/
+.webpack_cache/
+
+# Các file env
+.env.development
+.env.production
+.env.staging
+.env.local

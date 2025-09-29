@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông báo từ {{ app_name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .header img {
+            max-width: 120px;
+        }
+        .content {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .notification-date {
+            color: #777;
+            font-size: 14px;
+            text-align: right;
+            margin-bottom: 15px;
+        }
+        .book-info {
+            display: flex;
+            margin: 20px 0;
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .book-cover {
+            flex: 0 0 100px;
+            margin-right: 15px;
+        }
+        .book-cover img {
+            max-width: 100%;
+            border-radius: 3px;
+        }
+        .book-details {
+            flex: 1;
+        }
+        .book-title {
+            font-size: 18px;
+            margin: 0 0 5px;
+            color: #2c3e50;
+        }
+        .book-author {
+            font-size: 14px;
+            color: #666;
+            margin: 0 0 10px;
+        }
+        .footer {
+            font-size: 12px;
+            text-align: center;
+            color: #777;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4285f4;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .unsubscribe {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ app_name }}</h1>
+    </div>
+    
+    <div class="notification-date">
+        {{ notification_date }}
+    </div>
+    
+    <div class="content">
+        {% if notification_type == "new_book" %}
+            <h2>Sách mới đã sẵn sàng!</h2>
+            <p>Chúng tôi vừa thêm cuốn sách mới có thể phù hợp với sở thích của bạn.</p>
+            
+            <div class="book-info">
+                <div class="book-cover">
+                    <img src="{{ book_cover_url }}" alt="{{ book_title }}">
+                </div>
+                <div class="book-details">
+                    <h3 class="book-title">{{ book_title }}</h3>
+                    <p class="book-author">bởi {{ book_author }}</p>
+                    <p>{{ book_description|truncate(120) }}</p>
+                    <a href="{{ book_url }}" class="button">Xem sách</a>
+                </div>
+            </div>
+            
+        {% elif notification_type == "reading_reminder" %}
+            <h2>Nhắc nhở đọc sách</h2>
+            <p>Đã {{ days_since_last_read }} ngày kể từ lần cuối bạn đọc "{{ book_title }}".</p>
+            <p>Hãy tiếp tục hành trình đọc sách của bạn để khám phá những nội dung thú vị tiếp theo.</p>
+            
+            <div class="book-info">
+                <div class="book-cover">
+                    <img src="{{ book_cover_url }}" alt="{{ book_title }}">
+                </div>
+                <div class="book-details">
+                    <h3 class="book-title">{{ book_title }}</h3>
+                    <p class="book-author">bởi {{ book_author }}</p>
+                    <p>Bạn đã đọc: {{ read_percentage }}%</p>
+                    <a href="{{ reading_url }}" class="button">Tiếp tục đọc</a>
+                </div>
+            </div>
+            
+        {% elif notification_type == "recommendation" %}
+            <h2>Gợi ý sách dành cho bạn</h2>
+            <p>Dựa trên sở thích đọc của bạn, chúng tôi nghĩ bạn sẽ thích những cuốn sách này:</p>
+            
+            {% for book in recommended_books %}
+            <div class="book-info">
+                <div class="book-cover">
+                    <img src="{{ book.cover_url }}" alt="{{ book.title }}">
+                </div>
+                <div class="book-details">
+                    <h3 class="book-title">{{ book.title }}</h3>
+                    <p class="book-author">bởi {{ book.author }}</p>
+                    <p>{{ book.reason }}</p>
+                    <a href="{{ book.url }}" class="button">Xem sách</a>
+                </div>
+            </div>
+            {% endfor %}
+            
+        {% else %}
+            <h2>{{ notification_title }}</h2>
+            <p>{{ notification_message }}</p>
+            
+            {% if action_url %}
+            <p style="text-align: center; margin: 25px 0;">
+                <a href="{{ action_url }}" class="button">{{ action_text|default('Xem chi tiết') }}</a>
+            </p>
+            {% endif %}
+        {% endif %}
+    </div>
+    
+    <div class="unsubscribe">
+        <p>Bạn nhận được email này vì bạn đã đăng ký nhận thông báo từ {{ app_name }}.</p>
+        <p>Để thay đổi tùy chọn email, <a href="{{ unsubscribe_url }}">hãy nhấp vào đây</a>.</p>
+    </div>
+    
+    <div class="footer">
+        <p>&copy; {{ year }} {{ app_name }}. Tất cả các quyền được bảo lưu.</p>
+    </div>
+</body>
+</html>
