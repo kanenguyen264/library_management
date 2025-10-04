@@ -1,3 +1,10 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.dev
+.env.prod
+
 # Python
 __pycache__/
 *.py[cod]
@@ -20,99 +27,50 @@ wheels/
 .installed.cfg
 *.egg
 MANIFEST
-.coverage
-htmlcov/
-.pytest_cache/
-.coverage.*
-coverage.xml
-*.cover
-.hypothesis/
-nosetests.xml
-
-# Environments
-.env
-.env.*
-!.env.example
-.venv
+.venv/
 venv/
-ENV/
-env/
-env.bak/
-venv.bak/
-.env.example
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+.eslintcache
+dist/
+*.tsbuildinfo
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
 
 # IDE
-.idea/
 .vscode/
+.idea/
 *.swp
 *.swo
+*~
 .DS_Store
-*.sublime-workspace
-*.sublime-project
-
-# Databases
-*.sqlite3
-*.db
-*.sql
-postgres-data/
 
 # Logs
-logs/*
-!logs/.gitkeep
+logs/
 *.log
-log/
-
-# Project specific
-alembic/versions/*
-!alembic/versions/.gitkeep
-!alembic/versions/README
-secrets/
-media/
-static/collected/
-celerybeat-schedule
-celerybeat.pid
-.mypy_cache/
 
 # Docker
-.docker/
-docker-compose.override.yml
+.dockerignore
 
-# Caches
+# Coverage
+.coverage
+coverage/
+htmlcov/
+.nyc_output
+
+# Uploads
+uploads/
+static/uploads/
+
+# Cache
 .cache/
 .pytest_cache/
 .mypy_cache/
-.ruff_cache/
-
-# Generated files
-*.tar.gz
-*.zip
-*.gzip
-generated/
-
-# Temp files
-tmp/
-temp/
-.temp/
-
-# Keys and certificates
-*.key
-*.pem
-*.crt
-*.cert
-
-# Node (for documentation or frontend)
-node_modules/
-npm-debug.log
-yarn-error.log
-yarn-debug.log
-
-# Web assets
-.webassets-cache/
-.sass-cache/
-.webpack_cache/
-
-# Các file env
-.env.development
-.env.production
-.env.staging
-.env.local

@@ -1,0 +1,180 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "book-reading-api"
+version = "1.0.0"
+description = "A clean and modern book reading platform API"
+license = {text = "MIT"}
+authors = [
+    {name = "Book Reading API Team"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+requires-python = ">=3.8.1"
+dependencies = [
+    # Core Framework
+    "fastapi>=0.115.14",
+    "uvicorn[standard]>=0.33.0",
+    # Database
+    "sqlalchemy>=2.0.41",
+    "alembic>=1.14.1",
+    "psycopg2-binary>=2.9.10",
+    # Validation & Settings
+    "pydantic[email]>=2.10.6",
+    "pydantic-settings>=2.8.1",
+    # Security & Authentication
+    "python-jose[cryptography]>=3.4.0",
+    "passlib[bcrypt]>=1.7.4",
+    "bcrypt>=3.2.0,<4.0.0", # Pin bcrypt version for passlib compatibility
+    "python-multipart>=0.0.20",
+    # Environment & Utils
+    "python-dotenv>=1.0.0",
+    "python-dateutil>=2.8.2",
+    # Async Support
+    "greenlet>=3.0.0",
+    # Type Support
+    "typing-extensions>=4.8.0",
+    "supabase>=2.6.0",
+    "psutil>=7.0.0",
+    "ruff>=0.12.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Testing
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "httpx>=0.25.2",
+    "pytest-cov>=4.1.0",
+    
+    # Code Quality
+    "black>=23.11.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.7.0",
+    
+    # Development Tools
+    "pre-commit>=3.5.0",
+    "bandit>=1.7.5",
+]
+
+prod = [
+    # Production monitoring
+    "sentry-sdk[fastapi]>=1.38.0",
+    "prometheus-fastapi-instrumentator>=6.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/book-reading-api"
+Documentation = "https://github.com/yourusername/book-reading-api"
+Repository = "https://github.com/yourusername/book-reading-api"
+"Bug Tracker" = "https://github.com/yourusername/book-reading-api/issues"
+
+# Build configuration
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/app",
+    "/alembic",
+    "/scripts",
+    "pyproject.toml",
+    "README.md",
+    ".env.example",
+    "alembic.ini",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.4.3",
+    "pytest-asyncio>=0.21.1",
+    "httpx>=0.25.2",
+    "pytest-cov>=4.1.0",
+    "black>=23.11.0",
+    "isort>=5.12.0",
+    "flake8>=6.1.0",
+    "mypy>=1.7.0",
+    "pre-commit>=3.5.0",
+    "bandit>=1.7.5",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | alembic/versions
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+line_length = 88
+skip_glob = ["*/alembic/versions/*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/alembic/*",
+    "*/venv/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests", "alembic"]
+skips = ["B101", "B601"]
+
+[tool.ruff]
+ignore = ["F","E"]

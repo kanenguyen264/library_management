@@ -1,0 +1,152 @@
+services:
+  # PostgreSQL Database (Development & Production)
+  database:
+    image: postgres:15-alpine
+    container_name: ${DB_CONTAINER_NAME:-backend_db}
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bookstore_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-1234aa}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-bookstore_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (Optional - mainly for development)
+  redis:
+    image: redis:7-alpine
+    container_name: ${REDIS_CONTAINER_NAME:-backend_redis}
+    restart: unless-stopped
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend_network
+    # Only run in development mode
+    profiles:
+      - ${REDIS_PROFILE:-dev}
+
+  # Backend API (Universal - Development & Production)
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Mode can be 'development' or 'production'
+        - MODE=${MODE:-production}
+        
+        # Environment and API
+        - ENVIRONMENT=${ENVIRONMENT:-production}
+        - DEBUG=${DEBUG:-false}
+        - PROJECT_NAME=${PROJECT_NAME:-Book Reading API}
+        
+        # Database config
+        - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:1234aa@database:5432/bookstore_db}
+        
+        # Security
+        - SECRET_KEY=${SECRET_KEY:-development-secret-key-please-change-in-production-32-chars}
+        - ALGORITHM=${ALGORITHM:-HS256}
+        - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+        
+        # CORS settings
+        - BACKEND_CORS_ORIGINS=${BACKEND_CORS_ORIGINS:-["http://localhost:3000","http://localhost:3001","http://localhost:8000"]}
+        
+        # External services (optional)
+        - SUPABASE_URL=${SUPABASE_URL:-}
+        - SUPABASE_KEY=${SUPABASE_KEY:-}
+        - BUCKET_NAME=${BUCKET_NAME:-book-file-dev}
+        
+        # Email config (optional)
+        - SMTP_HOST=${SMTP_HOST:-}
+        - SMTP_PORT=${SMTP_PORT:-587}
+        - SMTP_USERNAME=${SMTP_USERNAME:-}
+        - SMTP_PASSWORD=${SMTP_PASSWORD:-}
+
+    container_name: ${CONTAINER_NAME:-backend_api}
+    restart: unless-stopped
+    
+    # Load environment from file if exists
+    env_file:
+      - ${ENV_FILE:-env.template}
+    
+    environment:
+      - MODE=${MODE:-production}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - DEBUG=${DEBUG:-false}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:1234aa@database:5432/bookstore_db}
+    
+    ports:
+      - "${HOST_PORT:-8000}:8000"
+    
+    # Volume mounts
+    volumes:
+      # Keep logs and uploads persistent across container restarts
+      - backend_logs:/app/logs
+      - backend_uploads:/app/uploads
+    
+    depends_on:
+      database:
+        condition: service_healthy
+    
+    networks:
+      - backend_network
+    
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-${MODE:-prod}.rule=Host(`${DOMAIN:-api.localhost}`)"
+      - "traefik.http.services.backend-${MODE:-prod}.loadbalancer.server.port=8000"
+      # Production SSL
+      - "traefik.http.routers.backend-${MODE:-prod}.tls=${ENABLE_TLS:-false}"
+      - "traefik.http.routers.backend-${MODE:-prod}.tls.certresolver=${CERT_RESOLVER:-letsencrypt}"
+      # CORS headers
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT,POST,DELETE,PATCH"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolalloworiginlist=${CORS_ORIGINS:-*}"
+      - "traefik.http.middlewares.backend-cors.headers.accesscontrolallowheaders=*"
+      - "traefik.http.routers.backend-${MODE:-prod}.middlewares=${MIDDLEWARES:-backend-cors}"
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Production resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT:-2.0}'
+          memory: ${MEMORY_LIMIT:-2G}
+        reservations:
+          cpus: '${CPU_RESERVE:-1.0}'
+          memory: ${MEMORY_RESERVE:-1G}
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_logs:
+    driver: local
+  backend_uploads:
+    driver: local
+
+networks:
+  backend_network:
+    driver: bridge
+    name: backend_network
+
+# For production, you might want to use external networks
+# networks:
+#   backend_network:
+#     external: true
+#     name: production_network 
